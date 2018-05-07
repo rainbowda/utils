@@ -1,0 +1,1 @@
+重构手法01：Extract Method （提炼函数）
