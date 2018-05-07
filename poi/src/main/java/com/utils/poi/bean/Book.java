@@ -1,4 +1,4 @@
-package com.utils.poi.before.bean;
+package com.utils.poi.bean;
 
 public class Book {
 	private int bookId;
@@ -7,19 +7,17 @@ public class Book {
 	private float price;
 	private String isbn;
 	private String pubName;
-	private byte[] preface;
 
 	public Book() {
 	}
 
-	public Book(int bookId, String name, String author, float price, String isbn, String pubName, byte[] preface) {
+	public Book(int bookId, String name, String author, float price, String isbn, String pubName) {
 		this.bookId = bookId;
 		this.name = name;
 		this.author = author;
 		this.price = price;
 		this.isbn = isbn;
 		this.pubName = pubName;
-		this.preface = preface;
 	}
 
 	public int getBookId() {
@@ -70,11 +68,4 @@ public class Book {
 		this.pubName = pubName;
 	}
 
-	public byte[] getPreface() {
-		return preface;
-	}
-
-	public void setPreface(byte[] preface) {
-		this.preface = preface;
-	}
 }

@@ -1,4 +1,4 @@
-package com.utils.poi.before.bean;
+package com.utils.poi.bean;
 
 import java.util.Date;
 
