@@ -2,16 +2,18 @@ package com.utils.poi.update_2;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.utils.poi.update_2.bean.CellEntity;
+import com.utils.poi.update_2.bean.SheetEntity;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -30,17 +32,18 @@ public class ExportExcel<T> {
 	private HSSFWorkbook workbook;
 	private AbstractCellStyle titleCellStyle;//标题行样式
 	private AbstractCellStyle dataCellStyle;//数据行样式
-	
+
 	public ExportExcel() {
 		this(new HSSFWorkbook());
 	}
 
+	/**
+	 * 这里可以定义两个常量，但是这里需要workbook，所以就没有抽取出来
+	 * @param workbook
+	 */
 	public ExportExcel(HSSFWorkbook workbook) {
 		this(workbook,new DefaultTitleCellStyle(workbook),new DefaultDataCellStyle(workbook));
 	}
-	
-	
-
 
 	public ExportExcel(HSSFWorkbook workbook, AbstractCellStyle titleCellStyle, AbstractCellStyle dataCellStyle) {
 		this.workbook = workbook;
@@ -48,17 +51,16 @@ public class ExportExcel<T> {
 		this.dataCellStyle = dataCellStyle;
 	}
 
-	public void exportExcel(String title, String[] headers, Collection<T> dataset, OutputStream out, String pattern) {
+	public void exportExcel(SheetEntity sheetEntity, OutputStream out) {
 		// 生成一个表格
-		HSSFSheet sheet = workbook.createSheet(title);
-		
+		HSSFSheet sheet = workbook.createSheet(sheetEntity.getSheetName());
 		// 生成数据标题和数据行样式
 		HSSFCellStyle rowTirtleStyle = titleCellStyle.getCellStyle();
 		HSSFCellStyle rowDataStyle = dataCellStyle.getCellStyle();
 		
 		//创建数据标题和数据行
-		createRowTitle(headers, sheet, rowTirtleStyle);
-		createRowData(dataset, sheet, rowDataStyle);
+		createRowTitle(sheetEntity.getHeaders(), sheet, rowTirtleStyle);
+		createRowData(sheetEntity.getCellEntitys(),sheetEntity.getDataset(), sheet, rowDataStyle);
 		
 		//写入流
 		writeExecl(out);
@@ -78,7 +80,7 @@ public class ExportExcel<T> {
 	/**
 	 * Description: 产生数据行
 	 */
-	private void createRowData(Collection<T> dataset,  HSSFSheet sheet, HSSFCellStyle rowDataStyle) {
+	private void createRowData(List<CellEntity> cellEntitys, Collection<T> dataset, HSSFSheet sheet, HSSFCellStyle rowDataStyle) {
 		// 遍历集合数据，产生数据行
 		Iterator<T> it = dataset.iterator();
 		int index = 0;
@@ -86,18 +88,15 @@ public class ExportExcel<T> {
 			index++;
 			HSSFRow row = sheet.createRow(index);
 			T t = (T) it.next();
-			// 利用反射，根据javabean属性的先后顺序，动态调用getXxx()方法得到属性值
-			Field[] fields = t.getClass().getDeclaredFields();
-			for (int i = 0; i < fields.length; i++) {
+			for (int i = 0; i < cellEntitys.size(); i++) {
 				HSSFCell cell = row.createCell(i);
 				cell.setCellStyle(rowDataStyle);
-				Field field = fields[i];
-				String fieldName = field.getName();
-				String getMethodName = "get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
 				try {
-					Class tCls = t.getClass();
-					Method getMethod = tCls.getMethod(getMethodName, new Class[] {});
-					Object value = getMethod.invoke(t, new Object[] {});
+					CellEntity cellEntity = cellEntitys.get(i);
+					Object value = PropertyUtils.getProperty(t, cellEntity.getFiledName());
+					if (value == null) {
+						continue;
+					}
 					// 判断值的类型后进行强制类型转换
 					String textValue = null;
 					if (value instanceof Boolean) {
