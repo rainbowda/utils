@@ -1,0 +1,12 @@
+package com.utils.poi.update_2.defaultDataHandle;
+
+public class DataHandlerFactory {
+
+	private static AbstractDataHandler dataHandler = new BooleanDataHandler(
+			new DateDataHandler(
+					new StringDataHandler(null)));
+
+	public static String dataHandle(Object value) {
+		return dataHandler.dataHandle(value);
+	}
+}
