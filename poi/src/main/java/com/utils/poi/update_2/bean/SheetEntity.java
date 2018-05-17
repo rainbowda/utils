@@ -6,50 +6,25 @@ import java.util.List;
 public class SheetEntity {
     private String sheetName;
 
-    private String[] headers;
-
-    private String[] fieldNames;
-
     private List<CellEntity> cellEntitys;
 
     private Collection dataset;
 
-    public List<CellEntity> getCellEntitys() {
-        return cellEntitys;
-    }
-
-    public void setCellEntitys(List<CellEntity> cellEntitys) {
+    public SheetEntity(String sheetName, List<CellEntity> cellEntitys, Collection dataset) {
+        this.sheetName = sheetName;
         this.cellEntitys = cellEntitys;
-        //设置headers和fieldNames
-        this.headers = new String[cellEntitys.size()];
-        this.fieldNames = new String[cellEntitys.size()];
-        for (int i = 0;i<cellEntitys.size();i++){
-            this.headers[i] = cellEntitys.get(i).getTitle();
-            this.fieldNames[i] = cellEntitys.get(i).getFiledName();
-        }
+        this.dataset = dataset;
     }
 
     public String getSheetName() {
         return sheetName;
     }
 
-    public void setSheetName(String sheetName) {
-        this.sheetName = sheetName;
-    }
-
-    public String[] getHeaders() {
-        return headers;
-    }
-
-    public String[] getFieldNames() {
-        return fieldNames;
+    public List<CellEntity> getCellEntitys() {
+        return cellEntitys;
     }
 
     public Collection getDataset() {
         return dataset;
-    }
-
-    public void setDataset(Collection dataset) {
-        this.dataset = dataset;
     }
 }
