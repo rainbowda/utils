@@ -2,26 +2,20 @@ package com.utils.poi.update_2;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import com.utils.poi.update_2.bean.CellEntity;
 import com.utils.poi.update_2.bean.SheetEntity;
+import com.utils.poi.update_2.defaultDataHandle.DataHandlerFactory;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 
 import com.utils.poi.update_2.style.AbstractCellStyle;
 import com.utils.poi.update_2.style.DefaultDataCellStyle;
@@ -59,7 +53,7 @@ public class ExportExcel<T> {
 		HSSFCellStyle rowDataStyle = dataCellStyle.getCellStyle();
 		
 		//创建数据标题和数据行
-		createRowTitle(sheetEntity.getHeaders(), sheet, rowTirtleStyle);
+		createRowTitle(sheetEntity.getCellEntitys(), sheet, rowTirtleStyle);
 		createRowData(sheetEntity.getCellEntitys(),sheetEntity.getDataset(), sheet, rowDataStyle);
 		
 		//写入流
@@ -92,54 +86,19 @@ public class ExportExcel<T> {
 				HSSFCell cell = row.createCell(i);
 				cell.setCellStyle(rowDataStyle);
 				try {
+					String textValue = null;
+
 					CellEntity cellEntity = cellEntitys.get(i);
 					Object value = PropertyUtils.getProperty(t, cellEntity.getFiledName());
-					if (value == null) {
-						continue;
-					}
-					// 判断值的类型后进行强制类型转换
-					String textValue = null;
-					if (value instanceof Boolean) {
-						boolean bValue = (Boolean) value;
-						textValue = "男";
-						if (!bValue) {
-							textValue = "女";
-						}
-					} else if (value instanceof Date) {
-						Date date = (Date) value;
-						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-						textValue = sdf.format(date);
-					} else {
-						// 其它数据类型都当作字符串简单处理
-						textValue = value.toString();
-					}
-					// 如果不是图片数据，就利用正则表达式判断textValue是否全部由数字组成
-					if (textValue != null) {
-						Pattern p = Pattern.compile("^//d+(//.//d+)?$");
-						Matcher matcher = p.matcher(textValue);
-						if (matcher.matches()) {
-							// 是数字当作double处理
-							cell.setCellValue(Double.parseDouble(textValue));
-						} else {
-							HSSFRichTextString richString = new HSSFRichTextString(textValue);
-							HSSFFont font3 = workbook.createFont();
-							font3.setColor(HSSFColor.BLUE.index);
-							richString.applyFont(font3);
-							cell.setCellValue(richString);
-						}
-					}
-				} catch (SecurityException e) {
+
+					if (cellEntity.getConversion() == null)
+						textValue = DataHandlerFactory.dataHandle(value);
+					else
+						textValue = cellEntity.getConversion().transferData(value);
+
+					cell.setCellValue(textValue);
+				} catch (Exception e) {
 					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-				} finally {
-					// 清理资源
 				}
 			}
 		}
@@ -148,12 +107,12 @@ public class ExportExcel<T> {
 	/**
 	 * Description: 产生表格标题行
 	 */
-	private void createRowTitle(String[] headers, HSSFSheet sheet, HSSFCellStyle rowTirtleStyle) {
+	private void createRowTitle(List<CellEntity> cellEntitys, HSSFSheet sheet, HSSFCellStyle rowTirtleStyle) {
 		HSSFRow row = sheet.createRow(0);
-		for (int i = 0; i < headers.length; i++) {
+		for (int i = 0; i < cellEntitys.size(); i++) {
 			HSSFCell cell = row.createCell(i);
 			cell.setCellStyle(rowTirtleStyle);
-			HSSFRichTextString text = new HSSFRichTextString(headers[i]);
+			HSSFRichTextString text = new HSSFRichTextString(cellEntitys.get(i).getTitle());
 			cell.setCellValue(text);
 		}
 	}
