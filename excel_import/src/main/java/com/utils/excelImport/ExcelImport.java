@@ -2,6 +2,7 @@ package com.utils.excelImport;
 
 import com.utils.excelImport.data.CellParam;
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.ss.usermodel.*;
 
 import java.io.InputStream;
@@ -75,6 +76,10 @@ public class ExcelImport<T> {
             case Cell.CELL_TYPE_FORMULA:
                 return cell.getNumericCellValue();
             case Cell.CELL_TYPE_NUMERIC:
+                //数字日期类型
+                if(HSSFDateUtil.isCellDateFormatted(cell)){
+                    return cell.getDateCellValue();
+                }
                 return cell.getNumericCellValue();
             case Cell.CELL_TYPE_STRING:
                 return cell.getStringCellValue();

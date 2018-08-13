@@ -14,6 +14,11 @@ public class DateConversion implements DataImportConversion<Date> {
 
     @Override
     public Date transferData(Object data) {
+        //如果data原本就是日期类型，则直接返回
+        if(data instanceof Date){
+            return (Date)data;
+        }
+
         try {
             return format.parse(data.toString());
         } catch (Exception e){
