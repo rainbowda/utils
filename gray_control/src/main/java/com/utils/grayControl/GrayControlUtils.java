@@ -2,17 +2,21 @@ package com.utils.grayControl;
 
 import com.utils.grayControl.bean.GrayControlBean;
 import com.utils.grayControl.config.GrayControlConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class GrayControlUtils {
 
+    @Autowired
     private GrayControlConfig grayControlConfig;
 
 
     /**
-     * true表示不拦截
-     * false表示拦截
+     * true表示拦截
+     * false表示不拦截
      * @param grayControlKey
      * @param id
      * @return
@@ -39,7 +43,7 @@ public class GrayControlUtils {
         }
 
 
-        return false;
+        return true;
     }
 
     /**
