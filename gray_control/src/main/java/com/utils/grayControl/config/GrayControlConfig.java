@@ -2,7 +2,6 @@ package com.utils.grayControl.config;
 
 import com.google.gson.Gson;
 import com.utils.grayControl.bean.GrayControlBean;
-import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
