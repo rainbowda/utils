@@ -1,6 +1,7 @@
 package com.utils.stateMachine;
 
 import com.utils.stateMachine.enums.StateEnum;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,9 +15,13 @@ public abstract class AbstractStateMachine {
 
     private Map<StateEnum,List<StateEnum>> stateMachine;
 
+    @Autowired
+    private StateMachineContainer stateMachineContainer;
+
     public void register(){
         stateMachine = new HashMap<>();
         buildStateMachine();
+        registerStatusMachine();
 
     }
 
@@ -36,13 +41,24 @@ public abstract class AbstractStateMachine {
         stateMachine.get(currentState).add(nextState);
     }
 
-
+    /**
+     * 向状态机容器中注册该状态机
+     */
+    private void registerStatusMachine() {
+        String stateMachineKey = getStateMachineKey();
+        stateMachineContainer.registerStateMachine(stateMachineKey, this);
+    }
 
 
     /**
-     * 交给子类实现
+     * 组装状态机
      */
     public abstract void buildStateMachine();
+
+    /**
+     * 获取状态机key
+     */
+    public abstract String getStateMachineKey();
 
 
 }
