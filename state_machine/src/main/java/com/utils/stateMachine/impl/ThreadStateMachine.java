@@ -7,6 +7,9 @@ import com.utils.stateMachine.enums.StateEnum;
  * 线程状态机实现
  */
 public class ThreadStateMachine extends AbstractStateMachine {
+
+    private static final String STATE_MACHINE_KEY = "thread";
+
     @Override
     public void buildStateMachine() {
         //线程创建
@@ -25,5 +28,10 @@ public class ThreadStateMachine extends AbstractStateMachine {
         addState(StateEnum.THREAD_BLOCKED, StateEnum.THREAD_READY);
         //线程超时等待
         addState(StateEnum.THREAD_TIMED_WAITING, StateEnum.THREAD_READY);
+    }
+
+    @Override
+    public String getStateMachineKey() {
+        return STATE_MACHINE_KEY;
     }
 }
