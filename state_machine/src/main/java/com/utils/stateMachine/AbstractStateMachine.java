@@ -3,6 +3,7 @@ package com.utils.stateMachine;
 import com.utils.stateMachine.enums.StateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ public abstract class AbstractStateMachine {
     @Autowired
     private StateMachineContainer stateMachineContainer;
 
+    @PostConstruct
     public void register(){
         stateMachine = new HashMap<>();
         buildStateMachine();
