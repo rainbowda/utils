@@ -4,10 +4,7 @@ import com.utils.stateMachine.enums.StateEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 抽象状态机
@@ -43,6 +40,7 @@ public abstract class AbstractStateMachine {
         stateMachine.get(currentState).add(nextState);
     }
 
+
     /**
      * 向状态机容器中注册该状态机
      */
@@ -51,6 +49,43 @@ public abstract class AbstractStateMachine {
         stateMachineContainer.registerStateMachine(stateMachineKey, this);
     }
 
+    /**
+     * 获取当前状态可以扭转的下一个状态
+     * @param currentState
+     * @return
+     */
+    private List<StateEnum> getNextStateList(StateEnum currentState){
+        if (currentState == null){
+            throw  new NullPointerException();
+        }
+
+        return stateMachine.get(currentState);
+    }
+
+    /**
+     * 判断状态是否可以扭转
+     * @param currentState
+     * @param nextState
+     * @return
+     */
+    public boolean canOperate(StateEnum currentState, StateEnum nextState){
+        if (currentState == null || nextState == null){
+            throw new NullPointerException();
+        }
+
+        List<StateEnum> nextStateList = getNextStateList(currentState);
+        if (nextStateList == null || nextStateList.size() == 0){
+            return Boolean.FALSE;
+        }
+
+        for (StateEnum stateEnum:nextStateList){
+            if (stateEnum.equals(nextState)){
+                return Boolean.TRUE;
+            }
+        }
+
+        return Boolean.FALSE;
+    }
 
     /**
      * 组装状态机
