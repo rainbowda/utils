@@ -2,10 +2,12 @@ package com.utils.stateMachine.impl;
 
 import com.utils.stateMachine.AbstractStateMachine;
 import com.utils.stateMachine.enums.StateEnum;
+import org.springframework.stereotype.Component;
 
 /**
  * 线程状态机实现
  */
+@Component
 public class ThreadStateMachine extends AbstractStateMachine {
 
     private static final String STATE_MACHINE_KEY = "thread";
